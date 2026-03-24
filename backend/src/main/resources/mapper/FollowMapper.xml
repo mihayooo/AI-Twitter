@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.ailearningbbs.repository.FollowRepository">
+
+    <resultMap id="BaseResultMap" type="com.example.ailearningbbs.entity.Follow">
+        <id column="id" property="id"/>
+        <result column="follower_id" property="followerId"/>
+        <result column="following_id" property="followingId"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <select id="findByFollowerIdAndFollowingId" resultMap="BaseResultMap">
+        SELECT * FROM follows WHERE follower_id = #{followerId} AND following_id = #{followingId}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO follows (follower_id, following_id, created_at)
+        VALUES (#{followerId}, #{followingId}, NOW())
+    </insert>
+
+    <delete id="deleteByFollowerIdAndFollowingId">
+        DELETE FROM follows WHERE follower_id = #{followerId} AND following_id = #{followingId}
+    </delete>
+
+    <select id="findFollowingIdsByFollowerId" resultType="java.lang.Long">
+        SELECT following_id FROM follows WHERE follower_id = #{followerId}
+    </select>
+
+    <select id="findFollowerIdsByFollowingId" resultType="java.lang.Long">
+        SELECT follower_id FROM follows WHERE following_id = #{followingId}
+    </select>
+
+    <select id="countFollowing" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM follows WHERE follower_id = #{followerId}
+    </select>
+
+    <select id="countFollowers" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM follows WHERE following_id = #{followingId}
+    </select>
+
+</mapper>

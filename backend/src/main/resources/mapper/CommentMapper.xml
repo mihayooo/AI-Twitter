@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.ailearningbbs.repository.CommentRepository">
+
+    <resultMap id="BaseResultMap" type="com.example.ailearningbbs.entity.Comment">
+        <id column="id" property="id"/>
+        <result column="post_id" property="postId"/>
+        <result column="user_id" property="userId"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="content" property="content"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <resultMap id="CommentWithUserMap" type="com.example.ailearningbbs.entity.Comment" extends="BaseResultMap">
+        <result column="username" property="username"/>
+        <result column="user_avatar" property="userAvatar"/>
+    </resultMap>
+
+    <select id="findById" resultMap="CommentWithUserMap">
+        SELECT c.*, u.username, u.avatar as user_avatar
+        FROM comments c
+        JOIN users u ON c.user_id = u.id
+        WHERE c.id = #{id}
+    </select>
+
+    <select id="findByPostId" resultMap="CommentWithUserMap">
+        SELECT c.*, u.username, u.avatar as user_avatar
+        FROM comments c
+        JOIN users u ON c.user_id = u.id
+        WHERE c.post_id = #{postId}
+        ORDER BY c.created_at ASC
+        LIMIT #{page}, #{size}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO comments (post_id, user_id, parent_id, content, created_at, updated_at)
+        VALUES (#{postId}, #{userId}, #{parentId}, #{content}, NOW(), NOW())
+    </insert>
+
+    <delete id="deleteById">
+        DELETE FROM comments WHERE id = #{id}
+    </delete>
+
+    <select id="countByPostId" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM comments WHERE post_id = #{postId}
+    </select>
+
+    <select id="findByParentId" resultMap="CommentWithUserMap">
+        SELECT c.*, u.username, u.avatar as user_avatar
+        FROM comments c
+        JOIN users u ON c.user_id = u.id
+        WHERE c.parent_id = #{parentId}
+        ORDER BY c.created_at ASC
+        LIMIT #{page}, #{size}
+    </select>
+
+    <select id="countByParentId" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM comments WHERE parent_id = #{parentId}
+    </select>
+
+</mapper>

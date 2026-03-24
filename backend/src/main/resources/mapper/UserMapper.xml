@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.ailearningbbs.repository.UserRepository">
+
+    <resultMap id="BaseResultMap" type="com.example.ailearningbbs.entity.User">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="email" property="email"/>
+        <result column="password_hash" property="passwordHash"/>
+        <result column="avatar" property="avatar"/>
+        <result column="bio" property="bio"/>
+        <result column="role" property="role"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <select id="findById" resultMap="BaseResultMap">
+        SELECT * FROM users WHERE id = #{id}
+    </select>
+
+    <select id="findByUsername" resultMap="BaseResultMap">
+        SELECT * FROM users WHERE username = #{username}
+    </select>
+
+    <select id="findByEmail" resultMap="BaseResultMap">
+        SELECT * FROM users WHERE email = #{email}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO users (username, email, password_hash, avatar, bio, role, created_at, updated_at)
+        VALUES (#{username}, #{email}, #{passwordHash}, #{avatar}, #{bio}, 'user', NOW(), NOW())
+    </insert>
+
+    <update id="update">
+        UPDATE users
+        <set>
+            <if test="username != null">username = #{username},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="passwordHash != null">password_hash = #{passwordHash},</if>
+            <if test="avatar != null">avatar = #{avatar},</if>
+            <if test="bio != null">bio = #{bio},</if>
+            updated_at = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM users WHERE id = #{id}
+    </delete>
+
+    <select id="countFollowers" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM follows WHERE following_id = #{userId}
+    </select>
+
+    <select id="countFollowing" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM follows WHERE follower_id = #{userId}
+    </select>
+
+    <select id="countPosts" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM posts WHERE user_id = #{userId}
+    </select>
+
+</mapper>

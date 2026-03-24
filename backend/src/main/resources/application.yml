@@ -1,0 +1,58 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: ailearning-bbs
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/ailearning_bbs?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  # 暂时关闭自动SQL初始化，手动执行 schema.sql
+  # sql:
+  #   init:
+  #     mode: always
+  #     schema-locations: classpath:/sql/schema.sql
+
+  # 自动建表选项（可选：开发环境使用）
+  # 如果使用 schema.sql 初始化，可以关闭这个
+  # jpa:
+  #   hibernate:
+  #     ddl-auto: create-drop
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.example.ailearningbbs.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+jwt:
+  secret: ailearning-bbs-secret-key-change-in-production-please-use-strong-random-key
+  expiration: 86400000 # 24小时，单位毫秒
+  token-prefix: "Bearer "
+
+logging:
+  level:
+    com.example.ailearningbbs: DEBUG
+    org.springframework.web: INFO
+    org.mybatis: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html

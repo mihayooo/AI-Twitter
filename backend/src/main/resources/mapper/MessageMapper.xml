@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.ailearningbbs.repository.MessageRepository">
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO messages (sender_id, receiver_id, content, is_read, created_at)
+        VALUES (#{senderId}, #{receiverId}, #{content}, #{isRead}, NOW())
+    </insert>
+
+    <select id="findBySenderIdAndReceiverId" resultType="com.example.ailearningbbs.entity.Message">
+        SELECT * FROM messages
+        WHERE (sender_id = #{senderId} AND receiver_id = #{receiverId})
+           OR (sender_id = #{receiverId} AND receiver_id = #{senderId})
+        ORDER BY created_at DESC
+        LIMIT #{page}, #{size}
+    </select>
+
+    <select id="findConversations" resultType="com.example.ailearningbbs.entity.Message">
+        SELECT * FROM messages
+        WHERE (sender_id = #{userId} AND receiver_id = #{otherUserId})
+           OR (sender_id = #{otherUserId} AND receiver_id = #{userId})
+        ORDER BY created_at DESC
+        LIMIT #{page}, #{size}
+    </select>
+
+    <select id="findUserList" resultType="java.util HashMap">
+        SELECT
+            u.id,
+            u.username,
+            u.avatar,
+            (SELECT content FROM messages m
+             WHERE ((m.sender_id = #{userId} AND m.receiver_id = u.id)
+                OR (m.sender_id = u.id AND m.receiver_id = #{userId}))
+             ORDER BY m.created_at DESC LIMIT 1) as last_message,
+            (SELECT created_at FROM messages m
+             WHERE ((m.sender_id = #{userId} AND m.receiver_id = u.id)
+                OR (m.sender_id = u.id AND m.receiver_id = #{userId}))
+             ORDER BY m.created_at DESC LIMIT 1) as last_message_time,
+            (SELECT COUNT(*) FROM messages m
+             WHERE m.sender_id = u.id
+               AND m.receiver_id = #{userId}
+               AND m.is_read = FALSE) as unread_count
+        FROM users u
+        WHERE u.id IN (
+            SELECT DISTINCT CASE
+                WHEN sender_id = #{userId} THEN receiver_id
+                ELSE sender_id
+            END
+            FROM messages
+            WHERE sender_id = #{userId} OR receiver_id = #{userId}
+        )
+        ORDER BY last_message_time DESC
+    </select>
+
+    <select id="countUnread" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM messages
+        WHERE receiver_id = #{receiverId} AND sender_id = #{senderId} AND is_read = FALSE
+    </select>
+
+    <update id="markAsRead">
+        UPDATE messages
+        SET is_read = TRUE
+        WHERE receiver_id = #{receiverId} AND sender_id = #{senderId} AND is_read = FALSE
+    </update>
+
+    <update id="markAllAsRead">
+        UPDATE messages
+        SET is_read = TRUE
+        WHERE receiver_id = #{receiverId} AND sender_id = #{senderId} AND is_read = FALSE
+    </update>
+
+</mapper>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.ailearningbbs.repository.BookmarkRepository">
+
+    <resultMap id="BaseResultMap" type="com.example.ailearningbbs.entity.Bookmark">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="post_id" property="postId"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <select id="findByUserIdAndPostId" resultMap="BaseResultMap">
+        SELECT * FROM bookmarks WHERE user_id = #{userId} AND post_id = #{postId}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO bookmarks (user_id, post_id, created_at)
+        VALUES (#{userId}, #{postId}, NOW())
+    </insert>
+
+    <delete id="deleteByUserIdAndPostId">
+        DELETE FROM bookmarks WHERE user_id = #{userId} AND post_id = #{postId}
+    </delete>
+
+</mapper>

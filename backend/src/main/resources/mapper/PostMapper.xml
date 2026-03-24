@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.ailearningbbs.repository.PostRepository">
+
+    <resultMap id="BaseResultMap" type="com.example.ailearningbbs.entity.Post">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="content" property="content"/>
+        <result column="resource_url" property="resourceUrl"/>
+        <result column="tags" property="tags"/>
+        <result column="like_count" property="likeCount"/>
+        <result column="comment_count" property="commentCount"/>
+        <result column="status" property="status"/>
+        <result column="review_note" property="reviewNote"/>
+        <result column="reviewed_by" property="reviewedBy"/>
+        <result column="reviewed_at" property="reviewedAt"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <resultMap id="PostWithUserMap" type="com.example.ailearningbbs.entity.Post" extends="BaseResultMap">
+        <result column="username" property="username"/>
+        <result column="user_avatar" property="userAvatar"/>
+    </resultMap>
+
+    <select id="findById" resultMap="PostWithUserMap">
+        SELECT p.*, u.username, u.avatar as user_avatar
+        FROM posts p
+        JOIN users u ON p.user_id = u.id
+        WHERE p.id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="PostWithUserMap">
+        SELECT p.*, u.username, u.avatar as user_avatar
+        FROM posts p
+        JOIN users u ON p.user_id = u.id
+        WHERE p.status = 'approved'
+        ORDER BY p.created_at DESC
+        LIMIT #{page}, #{size}
+    </select>
+
+    <select id="findByUserId" resultMap="PostWithUserMap">
+        SELECT p.*, u.username, u.avatar as user_avatar
+        FROM posts p
+        JOIN users u ON p.user_id = u.id
+        WHERE p.user_id = #{userId}
+        ORDER BY p.created_at DESC
+        LIMIT #{page}, #{size}
+    </select>
+
+    <select id="findByUserIdAndStatus" resultMap="PostWithUserMap">
+        SELECT p.*, u.username, u.avatar as user_avatar
+        FROM posts p
+        JOIN users u ON p.user_id = u.id
+        WHERE p.user_id = #{userId} AND p.status = #{status}
+        ORDER BY p.created_at DESC
+        LIMIT #{page}, #{size}
+    </select>
+
+    <select id="findByTag" resultMap="PostWithUserMap">
+        SELECT p.*, u.username, u.avatar as user_avatar
+        FROM posts p
+        JOIN users u ON p.user_id = u.id
+        WHERE FIND_IN_SET(#{tag}, p.tags) > 0
+        ORDER BY p.created_at DESC
+        LIMIT #{page}, #{size}
+    </select>
+
+    <select id="findByTagAndStatus" resultMap="PostWithUserMap">
+        SELECT p.*, u.username, u.avatar as user_avatar
+        FROM posts p
+        JOIN users u ON p.user_id = u.id
+        WHERE FIND_IN_SET(#{tag}, p.tags) > 0 AND p.status = #{status}
+        ORDER BY p.created_at DESC
+        LIMIT #{page}, #{size}
+    </select>
+
+    <select id="findByUserIds" resultMap="PostWithUserMap">
+        SELECT p.*, u.username, u.avatar as user_avatar
+        FROM posts p
+        JOIN users u ON p.user_id = u.id
+        WHERE p.user_id IN
+        <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+        ORDER BY p.created_at DESC
+        LIMIT #{page}, #{size}
+    </select>
+
+    <select id="findByUserIdsAndStatus" resultMap="PostWithUserMap">
+        SELECT p.*, u.username, u.avatar as user_avatar
+        FROM posts p
+        JOIN users u ON p.user_id = u.id
+        WHERE p.user_id IN
+        <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+        AND p.status = #{status}
+        ORDER BY p.created_at DESC
+        LIMIT #{page}, #{size}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO posts (user_id, content, resource_url, tags, like_count, comment_count, status, created_at, updated_at)
+        VALUES (#{userId}, #{content}, #{resourceUrl}, #{tags}, 0, 0, 'pending', NOW(), NOW())
+    </insert>
+
+    <update id="update">
+        UPDATE posts
+        <set>
+            <if test="content != null">content = #{content},</if>
+            <if test="resourceUrl != null">resource_url = #{resourceUrl},</if>
+            <if test="tags != null">tags = #{tags},</if>
+            <if test="status != null">status = #{status},</if>
+            updated_at = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM posts WHERE id = #{id}
+    </delete>
+
+    <update id="incrementLikeCount">
+        UPDATE posts SET like_count = like_count + 1 WHERE id = #{id}
+    </update>
+
+    <update id="decrementLikeCount">
+        UPDATE posts SET like_count = GREATEST(like_count - 1, 0) WHERE id = #{id}
+    </update>
+
+    <update id="incrementCommentCount">
+        UPDATE posts SET comment_count = comment_count + 1 WHERE id = #{id}
+    </update>
+
+    <update id="decrementCommentCount">
+        UPDATE posts SET comment_count = GREATEST(comment_count - 1, 0) WHERE id = #{id}
+    </update>
+
+    <select id="count" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM posts
+    </select>
+
+    <select id="findHotTags" resultType="java.util HashMap">
+        SELECT
+            SUBSTRING_INDEX(SUBSTRING_INDEX(tags, ',', numbers.n), ',', -1) AS tag,
+            COUNT(*) AS tag_count
+        FROM posts
+        CROSS JOIN (
+            SELECT 1 n UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5
+            UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10
+        ) numbers
+        WHERE tags != '' AND CHAR_LENGTH(tags) - CHAR_LENGTH(REPLACE(tags, ',', '')) >= numbers.n - 1
+        GROUP BY tag
+        ORDER BY tag_count DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="findByStatus" resultMap="PostWithUserMap">
+        SELECT p.*, u.username, u.avatar as user_avatar
+        FROM posts p
+        JOIN users u ON p.user_id = u.id
+        WHERE p.status = #{status}
+        ORDER BY p.created_at DESC
+        LIMIT #{page}, #{size}
+    </select>
+
+</mapper>

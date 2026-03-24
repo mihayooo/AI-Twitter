@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.ailearningbbs.repository.LikeRepository">
+
+    <resultMap id="BaseResultMap" type="com.example.ailearningbbs.entity.Like">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="post_id" property="postId"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <select id="findByUserIdAndPostId" resultMap="BaseResultMap">
+        SELECT * FROM likes WHERE user_id = #{userId} AND post_id = #{postId}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO likes (user_id, post_id, created_at)
+        VALUES (#{userId}, #{postId}, NOW())
+    </insert>
+
+    <delete id="deleteByUserIdAndPostId">
+        DELETE FROM likes WHERE user_id = #{userId} AND post_id = #{postId}
+    </delete>
+
+    <select id="countByPostId" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM likes WHERE post_id = #{postId}
+    </select>
+
+</mapper>
