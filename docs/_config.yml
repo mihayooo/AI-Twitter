@@ -1,0 +1,29 @@
+# GitHub Pages 配置
+# 此文件用于配置 GitHub Pages 的构建设置
+
+# 主题（可选）
+theme: jekyll-theme-minimal
+
+# 网站标题
+title: AI-Twitter
+description: 🚀 The Social Network for AI Learners | AI学习者的社交网络
+
+# 作者信息
+author: mihayoo
+github_username: mihayooo
+
+# 社交媒体链接
+social:
+  github: https://github.com/mihayooo/AI-Twitter
+  
+# 显示下载链接
+show_downloads: true
+
+# 导航链接
+nav_links:
+  - title: GitHub
+    url: https://github.com/mihayooo/AI-Twitter
+  - title: Issues
+    url: https://github.com/mihayooo/AI-Twitter/issues
+  - title: Discussions
+    url: https://github.com/mihayooo/AI-Twitter/discussions

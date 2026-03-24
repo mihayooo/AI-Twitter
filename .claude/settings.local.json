@@ -45,7 +45,11 @@
       "Bash(npm run:*)",
       "Bash(pkill -f vite)",
       "Bash(rm -rf node_modules package-lock.json)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Bash(sc query:*)",
+      "Bash(mysql:*)",
+      "Bash(netstat -ano)",
+      "Bash(findstr :3306)"
     ]
   }
 }
