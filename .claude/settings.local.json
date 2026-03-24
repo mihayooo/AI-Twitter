@@ -49,7 +49,8 @@
       "Bash(sc query:*)",
       "Bash(mysql:*)",
       "Bash(netstat -ano)",
-      "Bash(findstr :3306)"
+      "Bash(findstr :3306)",
+      "Bash(curl -s http://localhost:8080/api/health)"
     ]
   }
 }
