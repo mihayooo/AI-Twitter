@@ -103,19 +103,6 @@ public class PostService {
         return post;
     }
 
-    public List<TagStats> findHotTags(int limit) {
-        List<Map<String, Object>> results = postRepository.findHotTags(limit);
-        List<TagStats> tagStats = new ArrayList<>();
-
-        for (Map<String, Object> row : results) {
-            String tag = (String) row.get("tag");
-            Long count = (Long) row.get("tag_count");
-            tagStats.add(new TagStats(tag, count.intValue()));
-        }
-
-        return tagStats;
-    }
-
     @Transactional
     public Post reviewPost(Long postId, Long reviewerId, String status, String reviewNote) {
         Post post = findById(postId);

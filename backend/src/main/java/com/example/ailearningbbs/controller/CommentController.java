@@ -53,8 +53,9 @@ public class CommentController {
         return ApiResponse.success(responses);
     }
 
-    @PostMapping
+    @PostMapping("/post/{postId}")
     public ApiResponse<CommentResponse> createComment(
+            @PathVariable Long postId,
             @Valid @RequestBody CreateCommentRequest request,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
@@ -63,7 +64,7 @@ public class CommentController {
         }
 
         Comment comment = commentService.create(
-                request.getPostId() != null ? request.getPostId() : null,
+                postId,
                 userPrincipal.getId(),
                 request.getContent(),
                 request.getParentId()

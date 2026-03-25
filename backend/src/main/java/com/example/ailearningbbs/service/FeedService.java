@@ -31,7 +31,7 @@ public class FeedService {
 
             // 如果关注用户的帖子不够，获取更多全局帖子补充
             if (posts.size() < size) {
-                List<Post> allPosts = postRepository.findAll(page, size);
+                List<Post> allPosts = postRepository.findAllByStatus("approved", page, size);
                 for (Post allPost : allPosts) {
                     boolean alreadyAdded = false;
                     for (Post p : posts) {
@@ -48,7 +48,7 @@ public class FeedService {
             }
         } else {
             // 3. 如果没有关注，返回全局帖子
-            posts = postRepository.findAll(page, size);
+            posts = postRepository.findAllByStatus("approved", page, size);
         }
 
         return posts;
@@ -58,13 +58,13 @@ public class FeedService {
      * 获取发现页（全局帖子，按时间倒序）
      */
     public List<Post> getDiscover(int page, int size) {
-        return postRepository.findAll(page, size);
+        return postRepository.findAllByStatus("approved", page, size);
     }
 
     /**
      * 获取标签相关的帖子
      */
     public List<Post> getByTag(String tag, int page, int size) {
-        return postRepository.findByTag(tag, page, size);
+        return postRepository.findByTagAndStatus(tag, "approved", page, size);
     }
 }

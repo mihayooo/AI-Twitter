@@ -31,11 +31,11 @@
         WHERE p.id = #{id}
     </select>
 
-    <select id="findAll" resultMap="PostWithUserMap">
+    <select id="findAllByStatus" resultMap="PostWithUserMap">
         SELECT p.*, u.username, u.avatar as user_avatar
         FROM posts p
         JOIN users u ON p.user_id = u.id
-        WHERE p.status = 'approved'
+        WHERE p.status = #{status}
         ORDER BY p.created_at DESC
         LIMIT #{page}, #{size}
     </select>
@@ -142,7 +142,7 @@
         SELECT COUNT(*) FROM posts
     </select>
 
-    <select id="findHotTags" resultType="java.util HashMap">
+    <select id="findHotTags" resultType="java.util.HashMap">
         SELECT
             SUBSTRING_INDEX(SUBSTRING_INDEX(tags, ',', numbers.n), ',', -1) AS tag,
             COUNT(*) AS tag_count

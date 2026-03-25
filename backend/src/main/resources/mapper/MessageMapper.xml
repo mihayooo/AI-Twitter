@@ -24,7 +24,7 @@
         LIMIT #{page}, #{size}
     </select>
 
-    <select id="findUserList" resultType="java.util HashMap">
+    <select id="findUserList" resultType="java.util.HashMap">
         SELECT
             u.id,
             u.username,

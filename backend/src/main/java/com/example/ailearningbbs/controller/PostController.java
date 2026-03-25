@@ -5,6 +5,8 @@ import com.example.ailearningbbs.dto.response.ApiResponse;
 import com.example.ailearningbbs.dto.response.PostResponse;
 import com.example.ailearningbbs.dto.response.TagStats;
 import com.example.ailearningbbs.entity.Post;
+import com.example.ailearningbbs.entity.User;
+import com.example.ailearningbbs.repository.UserRepository;
 import com.example.ailearningbbs.security.UserPrincipal;
 import com.example.ailearningbbs.service.*;
 import jakarta.validation.Valid;
